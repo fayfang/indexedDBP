@@ -1,0 +1,14 @@
+language: node_js
+
+node_js:
+  - stable
+
+script:
+  - npm test -- --allow-chrome-as-root
+
+addons:
+  chrome: stable
+
+branches:
+  only:
+    - master

@@ -24,3 +24,5 @@ export interface IndexDBPOptions {
   onError?: any;
   onSuccess?: any;
 }
+
+export type transactionType = 'readonly' | 'readwrite' | 'versionchange' | undefined;

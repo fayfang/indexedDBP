@@ -1,5 +1,9 @@
 import {QueryOptions} from './interface';
-
+/**
+ * isversion error or not
+ * @param {object} errorEvent db's name
+ * @returns {Boolean}
+ */
 export function hasVersionError(errorEvent: any) {
   if ('error' in errorEvent.target) {
       return errorEvent.target.error.name === 'VersionError';
@@ -8,7 +12,11 @@ export function hasVersionError(errorEvent: any) {
   }
   return false;
 }
-
+/**
+ * parse the round query to IBDKeyRange
+ * @param {object} query query options
+ * @returns {Boolean}
+ */
 export function parseQueryToIDBKeyRange(query: QueryOptions) {
   const keys = Object.keys(query);
   const Islt = keys.indexOf('$lt') > -1 || keys.indexOf('$lte') > -1;
@@ -24,7 +32,11 @@ export function parseQueryToIDBKeyRange(query: QueryOptions) {
     return query.value || '';
   }
 }
-
+/**
+ * get index of the array-like obejct
+ * @param {object} query query options
+ * @returns {number} index
+ */
 export function getIndex(names: any, name: string) {
   let index = -1;
   for (let i = 0; i < names.length; i++) {

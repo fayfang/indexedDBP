@@ -2,7 +2,7 @@
  * 说明：
  * 封装indexDB成类mongo风格的API，提供方便的结构化调用
  */
-import {IndexDBPOptions, ObjectStoreOptions, QueryOptions, UpdateOptions} from './interface';
+import {IndexDBPOptions, ObjectStoreOptions, UpdateOptions, transactionType} from './interface';
 import {hasVersionError, parseQueryToIDBKeyRange, getIndex} from './tools';
 
 const DefaultIndexDBPOptions: IndexDBPOptions = {
@@ -26,8 +26,6 @@ const DefaultUpdateConfig = {
 };
 
 const IndexDB = window.indexedDB;
-
-type transactionType = 'readonly' | 'readwrite' | 'versionchange' | undefined;
 
 class IndexDBP {
   get db() {

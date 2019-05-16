@@ -3,7 +3,7 @@ const path = require('path');
 
 let compiler = webpack({
   mode: 'production',
-  entry: path.join(__dirname, '../src/main.js'),
+  entry: path.join(__dirname, '../src/main.ts'),
   output: {
     path: path.resolve(__dirname, '../dist'),
     filename: 'indexDBP.js',
@@ -11,12 +11,12 @@ let compiler = webpack({
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
+  resolve: {
+    extensions: ['.ts', '.js']
+  },
   module: {
     rules: [
-      {
-        test: /\.js/,
-        use: 'babel-loader'
-      }
+      { test: /\.ts$/, loader: 'ts-loader' }
     ]
   },
   performance: {

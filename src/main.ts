@@ -2,7 +2,7 @@
  * 说明：
  * 封装indexDB成类mongo风格的API，提供方便的结构化调用
  */
-import {IndexDBPOptions, ObjectStoreOptions, UpdateOptions, transactionType} from './interface';
+import {IndexDBPOptions, ObjectStoreOptions, UpdateOptions, transactionType, QueryOptions} from './interface';
 import {hasVersionError, parseQueryToIDBKeyRange, getIndex} from './tools';
 
 const DefaultIndexDBPOptions: IndexDBPOptions = {
@@ -175,6 +175,33 @@ class IndexDBP {
    * 集合的增删改查
    */
   /**
+   * count document
+   * @param {string} name
+   * @param {object | string} query the query params to find document
+   */
+  public async count(name: string, query?: QueryOptions) {
+    await this.toggleMode('normal');
+
+    const countPromise = new Promise((resolve, reject) => {
+      const objectStore = this.getObjectStore(name, 'readonly');
+      let req: any;
+      if (query) {
+        const params = parseQueryToIDBKeyRange(query);
+        req = objectStore.count(params);
+      } else {
+        req = objectStore.count();
+      }
+
+      this.documentHandleError(req, reject, 'count IDBRequest unknown error');
+
+      req.onsuccess = () => {
+        resolve(req.result);
+      };
+    });
+
+    return countPromise;
+  }
+  /**
    * find document
    * @param {string} name
    * @param {object | string} query the query params to find document
@@ -345,6 +372,10 @@ class IndexDBP {
           reject(this.patchError(error));
         }
       };
+      openRequest.onblocked = (event) => {
+        console.log(event);
+        reject(this.patchError('the db is blocked'));
+      };
       openRequest.onsuccess = (event: any) => {
         this.db = event.target.result;
         if (this.onSuccess) { this.onSuccess(event); }
@@ -369,6 +400,7 @@ class IndexDBP {
       update: this.update.bind(this, name),
       remove: this.remove.bind(this, name),
       find: this.find.bind(this, name),
+      count: this.count.bind(this, name),
       createIndex: this.createIndex.bind(this, name),
       deleteIndex: this.deleteIndex.bind(this, name),
       containIndex: this.containIndex.bind(this, name),

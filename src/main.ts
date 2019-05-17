@@ -135,14 +135,26 @@ class IndexDBP {
    * @returns {Boolean}
    */
   public containIndex(name: string, indexName: string) {
-    let transaction;
-    if (this.versionTransaction) {
-      transaction = this.versionTransaction;
-    } else {
-      transaction = this.getTransaction(name, 'readonly');
-    }
-    const objectStore = transaction.objectStore(name);
-    return getIndex(objectStore.indexNames, indexName) > -1;
+    const containIndexPromise = new Promise((resolve, reject) => {
+      let transaction;
+      if (this.versionTransaction) {
+        transaction = this.versionTransaction;
+      } else {
+        transaction = this.getTransaction(name, 'readonly');
+      }
+      const objectStore = transaction.objectStore(name);
+
+      transaction.onabort = (e) => {
+        reject(this.patchError('transaction abort'));
+      };
+      transaction.oncomplete = (e) => {
+        resolve(getIndex(objectStore.indexNames, indexName) > -1);
+      };
+      transaction.onerror = (e) => {
+        reject(this.patchError('transaction error'));
+      };
+    });
+    return containIndexPromise;
   }
   /**
    * create index

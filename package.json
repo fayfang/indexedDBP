@@ -1,8 +1,8 @@
 {
-  "name": "indexdb-p",
+  "name": "indexeddb-p",
   "version": "0.0.1",
-  "description": "indexDB Promise Api, similiar to mongoDB api",
-  "main": "dist/indexDBP.js",
+  "description": "IndexedDB Promise Api, similiar to mongoDB api",
+  "main": "dist/IndexedDBP.js",
   "license": "MIT",
   "private": false,
   "files": [
@@ -10,14 +10,14 @@
     "dist"
   ],
   "keywords": [
-    "indexDB",
+    "IndexedDB",
     "promise"
   ],
   "scripts": {
     "prepublish": "node script/build.js",
     "demo": "node script/demo.js",
     "build": "node script/build.js",
-    "test": "mochify"
+    "test": "mochify --timeout 150000"
   },
   "author": "FayFang",
   "devDependencies": {

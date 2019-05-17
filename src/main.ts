@@ -1,12 +1,12 @@
 /*
  * 说明：
- * 封装indexDB成类mongo风格的API，提供方便的结构化调用
+ * 封装indexedDB成类mongo风格的API，提供方便的结构化调用
  */
-import {IndexDBPOptions, ObjectStoreOptions, UpdateOptions, transactionType, QueryOptions} from './interface';
+import {IndexedDBPOptions, ObjectStoreOptions, UpdateOptions, transactionType, QueryOptions} from './interface';
 import {hasVersionError, parseQueryToIDBKeyRange, getIndex} from './tools';
 
-const DefaultIndexDBPOptions: IndexDBPOptions = {
-  name: 'indexDbP',
+const DefaultIndexedDBPOptions: IndexedDBPOptions = {
+  name: 'indexedDBP',
   version: 1,
   onError(error: any) {
     throw error;
@@ -25,9 +25,9 @@ const DefaultUpdateConfig = {
   extend: true,
 };
 
-const IndexDB = window.indexedDB;
+const IndexedDB = window.indexedDB;
 
-class IndexDBP {
+class IndexedDBP {
   get db() {
     return this.pdb;
   }
@@ -46,11 +46,11 @@ class IndexDBP {
   private versionTransaction!: IDBTransaction;
   private onError!: any;
   private onSuccess!: any;
-  constructor(options: IndexDBPOptions = DefaultIndexDBPOptions) {
+  constructor(options: IndexedDBPOptions = DefaultIndexedDBPOptions) {
     this.name = options.name;
     this.version = options.version;
-    this.onError = options.onError || DefaultIndexDBPOptions.onError;
-    this.onSuccess = options.onSuccess || DefaultIndexDBPOptions.onSuccess;
+    this.onError = options.onError || DefaultIndexedDBPOptions.onError;
+    this.onSuccess = options.onSuccess || DefaultIndexedDBPOptions.onSuccess;
   }
   public init() {
     return this.use(this.name, this.version);
@@ -62,6 +62,31 @@ class IndexDBP {
     const transaction = this.getTransaction(name, type);
     return transaction.objectStore(name);
   }
+  public containDataBase(name: string) {
+    const containPromise = new Promise((resolve, reject) => {
+      let dbExists = true;
+      const req = IndexedDB.open(name);
+      req.onblocked = (event: any) => {
+        event.target.result.close();
+        resolve(dbExists);
+      };
+      req.onsuccess = (event: any) => {
+        event.target.result.close();
+        resolve(dbExists);
+      };
+      req.onerror = (error) => {
+        reject(this.patchError('open db error'));
+      };
+      req.onupgradeneeded = (event: any) => {
+        dbExists = false;
+        event.target.result.close();
+        IndexedDB.deleteDatabase(name);
+        resolve(dbExists);
+      };
+    });
+
+    return containPromise;
+  }
   /**
    * delete Database
    * @param {none} .
@@ -69,11 +94,11 @@ class IndexDBP {
    */
   public dropDatabase() {
     const dropPromise = new Promise((resolve, reject) => {
-      if (IndexDB.deleteDatabase && this.db) {
+      if (IndexedDB.deleteDatabase && this.db) {
         const name = this.db.name;
         this.closeDB();
 
-        const deleteRequest = IndexDB.deleteDatabase(name);
+        const deleteRequest = IndexedDB.deleteDatabase(name);
         deleteRequest.onsuccess = (event) => {
           resolve(event);
         };
@@ -362,7 +387,7 @@ class IndexDBP {
    */
   private use(dbName: string, dbVersion?: number) {
     const dbPromise = new Promise((resolve, reject) => {
-      const openRequest = IndexDB.open(dbName, dbVersion);
+      const openRequest = IndexedDB.open(dbName, dbVersion);
       this.openRequest = openRequest;
 
       openRequest.onerror = (errorEvent: any) => {
@@ -469,4 +494,4 @@ class IndexDBP {
   }
 }
 
-export default IndexDBP;
+export default IndexedDBP;

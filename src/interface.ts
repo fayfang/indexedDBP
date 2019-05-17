@@ -18,7 +18,7 @@ export interface UpdateOptions {
   upsert?: boolean;
 }
 
-export interface IndexDBPOptions {
+export interface IndexedDBPOptions {
   name: string;
   version?: number;
   onError?: any;

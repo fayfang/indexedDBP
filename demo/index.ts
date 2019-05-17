@@ -1,13 +1,20 @@
-import IndexDBP from '../dist/indexDBP.js';
+import IndexedDBP from '../src/main';
 
 (async () => {
-  const mydb = new IndexDBP({
+  const mydb = new IndexedDBP({
     name: 'testDB',
   });
   await mydb.init();
+  console.log(mydb.db);
+  mydb.dropDatabase();
+  console.log(mydb.db);
+  return false;
   // deleteIndex
-  // if (mydb.containObjectStore('indexObjectStore') && mydb.$db.indexObjectStore.containIndex('time')) {
-  //   await mydb.$db.indexObjectStore.deleteIndex('time')
+  // const isContainIndex = await mydb.$db.indexObjectStore.containIndex('time');
+  // if (mydb.containObjectStore('indexObjectStore') && isContainIndex) {
+  //   await mydb.$db.indexObjectStore.deleteIndex('time');
+  // } else if (mydb.containObjectStore('indexObjectStore')) {
+  //   await mydb.$db.indexObjectStore.createIndex('time', 'time', {unique: false, multiEntry: false});
   // }
 
   // create objectStore
@@ -25,6 +32,8 @@ import IndexDBP from '../dist/indexDBP.js';
   // }
 
   // insert Data
+  const count = await mydb.$db.testObjectStore.count({$lte: 2});
+  console.log(count);
   await mydb.$db.testObjectStore.insert({key1: 'hello', key2: 123, key3: true, key4: new Date()});
   const rand1: number = Math.random();
   const rand2: number = Math.random();

@@ -1,7 +1,7 @@
-# indexDBP
-indexDBP is a simple way to use indexDB in browsers, base on Promise, similiar to mongoDB api.
+# IndexedDBP
+IndexedDBP is a simple way to use IndexedDB in browsers, base on Promise, similiar to mongoDB api.
 
-```npm install indexdb-p``` 
+```npm install indexeddb-p```
 
 #### Database Operation
 

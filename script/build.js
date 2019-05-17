@@ -6,8 +6,8 @@ let compiler = webpack({
   entry: path.join(__dirname, '../src/main.ts'),
   output: {
     path: path.resolve(__dirname, '../dist'),
-    filename: 'indexDBP.js',
-    library: 'indexDBP',
+    filename: 'IndexedDBP.js',
+    library: 'IndexedDBP',
     libraryTarget: 'umd',
     umdNamedDefine: true
   },

@@ -1,5 +1,5 @@
 {
-  "name": "indexeddb-p",
+  "name": "indexeddbp",
   "version": "0.0.1",
   "description": "IndexedDB Promise Api, similiar to mongoDB api",
   "main": "dist/IndexedDBP.js",

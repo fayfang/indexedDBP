@@ -1,54 +1,25 @@
 var chai = require('chai');
-var indexedDBPP = require('../dist/indexedDBP').default;
 var expect = chai.expect;
+var {createOSTest, deleteOSTest, createIndexTest, deleteIndexTest} = require('./example/objectStore');
 
 describe('test of objectStore operation', function() {
   it('create a objectStore', async function() {
-    let mydb = new indexedDBPP({name: 'testObjectStoreDB'});
-    await mydb.init();
-
-    if (!mydb.containObjectStore('testObjectStore')) {
-      await mydb.createObjectStore('testObjectStore');
-    }
-
-    expect(mydb.containObjectStore('testObjectStore')).to.equal(true);
+    let isOSExit = await createOSTest();
+    expect(isOSExit).to.equal(true);
   })
 
   it('delete a objectStore', async function() {
-    let mydb = new indexedDBPP({name: 'testObjectStoreDB'});
-    await mydb.init();
-
-    if (mydb.containObjectStore('testObjectStore')) {
-      await mydb.deleteObjectStore('testObjectStore');
-    }
-
-    expect(mydb.containObjectStore('testObjectStore')).to.equal(false);
+    let isOSExit = await deleteOSTest();
+    expect(isOSExit).to.equal(false);
   })
 
   it('create a index', async function() {
-    let mydb = new indexedDBPP({name: 'testindexedDBP'});
-    await mydb.init();
-
-    if (!mydb.containObjectStore('testindexedDBP')) {
-      await mydb.createObjectStore('testindexedDBP', {keyPath: 'randomId'});
-      await mydb.$db.testindexedDBP.createIndex('time', 'time', {unique: false, multiEntry: false});
-    }
-
-    let isContainIndex = mydb.$db.testindexedDBP.containIndex('time');
-    expect(isContainIndex).to.equal(true);
+    let isIndexExit = await createIndexTest();
+    expect(isIndexExit).to.equal(true);
   })
 
   it('delete a index', async function() {
-    let mydb = new indexedDBPP({name: 'testindexedDBP'});
-    await mydb.init();
-
-    if (mydb.containObjectStore('testindexedDBP')) {
-      console.log(123);
-      await mydb.toggleMode('versionChange');
-      await mydb.$db.testindexedDBP.deleteIndex('time');
-    }
-
-    let isContainIndex = mydb.$db.testindexedDBP.containIndex('time');
-    expect(isContainIndex).to.equal(false);
+    let isIndexExit = await deleteIndexTest();
+    expect(isIndexExit).to.equal(false);
   })
 })

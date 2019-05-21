@@ -1,106 +1,56 @@
 var chai = require('chai');
-var indexedDBP = require('../dist/indexedDBP').default;
+var {simpleDOCount, simpleDOFind, simpleDOInsert, simpleDORemove, simpleDOUpdate,
+  complexDOFind, complexDOInsert, complexDORemove, complexDOUpdate} = require('./example/document');
 var expect = chai.expect;
 
 describe('test of simple document operation', function() {
   it('insert a document', async function() {
-    let mydb = new indexedDBP({name: 'insertDocument'});
-    await mydb.init();
+    let result = await simpleDOInsert();
 
-    if (!mydb.containObjectStore('testInsert')) {
-      await mydb.createObjectStore('testInsert');
-    }
-
-    let result = await mydb.$db.testInsert.insert({id: 'testInsert1', word: 'hello world'});
-
-    expect(result && (result.type === 'success')).to.equal(true);
+    expect(result).to.equal(true);
   })
   it('find a document', async function() {
-    let mydb = new indexedDBP({name: 'insertDocument'});
-    await mydb.init();
+    let result = await simpleDOFind();
 
-    const res = await mydb.$db.testInsert.find('testInsert1');
-
-    expect(res[0].word).to.equal('hello world');
+    expect(result).to.equal(true);
   })
   it('count a document', async function() {
-    let mydb = new indexedDBP({name: 'insertDocument'});
-    await mydb.init();
+    let result = await simpleDOCount();
 
-    const res = await mydb.$db.testInsert.count();
-
-    expect(res).to.equal(1);
+    expect(result).to.equal(true);
   })
   it('update a document', async function() {
-    let mydb = new indexedDBP({name: 'insertDocument'});
-    await mydb.init();
+    let result = await simpleDOUpdate();
 
-    await mydb.$db.testInsert.update('testInsert1', {word: 'hello fay'});
-
-    const res = await mydb.$db.testInsert.find('testInsert1');
-
-    expect(res[0].word).to.equal('hello fay');
+    expect(result).to.equal(true);
   })
   it('remove a document', async function() {
-    let mydb = new indexedDBP({name: 'insertDocument'});
-    await mydb.init();
+    let result = await simpleDORemove();
 
-    await mydb.$db.testInsert.remove('testInsert1', {word: 'hello fay'});
-
-    const res = await mydb.$db.testInsert.find('testInsert1');
-
-    expect(res.length).to.equal(0);
+    expect(result).to.equal(true);
   })
 })
 
 describe('test of complex document operation', function() {
-  let counter = 0;
-
   it('insert a document', async function() {
-    let mydb = new indexedDBP({name: 'insertDocument'});
-    await mydb.init();
+    let result = await complexDOInsert();
 
-    if (!mydb.containObjectStore('testInsert2')) {
-      await mydb.createObjectStore('testInsert2', {keyPath: 'counterID'});
-      await mydb.$db.testInsert2.createIndex('time', 'time', {unique: false, multiEntry: false});
-    }
-
-    for(let i = 0; i < 10; i++) {
-      await mydb.$db.testInsert2.insert({counterID: counter++, time: new Date(2019, 4, i)});
-    }
-
-    let count = await mydb.$db.testInsert2.count();
-
-    expect(count).to.equal(10);
+    expect(result).to.equal(true);
   })
-  // it('find a document', async function() {
-  //   let mydb = new indexedDBP({name: 'insertDocument'});
-  //   await mydb.init();
+  it('find a document', async function() {
+    let result = await complexDOFind();
 
-  //   const res0 = await mydb.$db.testInsert2.find({
-  //     $lt
-  //   });
+    expect(result).to.equal(true);
 
-  //   expect(res[0].word).to.equal('hello world');
-  // })
-  // it('update a document', async function() {
-  //   let mydb = new indexedDBP({name: 'insertDocument'});
-  //   await mydb.init();
+  })
+  it('update a document', async function() {
+    let result = await complexDOUpdate();
 
-  //   await mydb.$db.testInsert.update('testInsert1', {word: 'hello fay'});
+    expect(result).to.equal(true);
+  })
+  it('remove a document', async function() {
+    let result = await complexDORemove();
 
-  //   const res = await mydb.$db.testInsert.find('testInsert1');
-
-  //   expect(res[0].word).to.equal('hello fay');
-  // })
-  // it('remove a document', async function() {
-  //   let mydb = new indexedDBP({name: 'insertDocument'});
-  //   await mydb.init();
-
-  //   await mydb.$db.testInsert.remove('testInsert1', {word: 'hello fay'});
-
-  //   const res = await mydb.$db.testInsert.find('testInsert1');
-
-  //   expect(res.length).to.equal(0);
-  // })
+    expect(result).to.equal(true);
+  })
 })

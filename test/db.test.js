@@ -1,30 +1,17 @@
 var chai = require('chai');
-var indexedDBP = require('../dist/indexedDBP').default;
 var expect = chai.expect;
+var {openDBTest, deleteDBTest} = require('./example/db');
 
 describe('test of db operation', function() {
   it('open a database', async function() {
-    let mydb = new indexedDBP({name: 'testUseDB'});
-    await mydb.init();
+    let isDBExit = await openDBTest();
 
-    // 新增加的db是versionchange的transaction,此时无法查询，先toggleMode变更到normal
-    await mydb.toggleMode('normal');
-
-    let DBnames = await indexedDB.databases();
-    DBnames = DBnames.map(db => db.name);
-
-    expect(DBnames.indexOf('testUseDB') > -1).to.equal(true);
+    expect(isDBExit).to.equal(true);
   })
 
   it('delete database', async function() {
-    let mydb = new indexedDBP({name: 'testDeketeDB'});
-    await mydb.init();
+    let isDBExit = await deleteDBTest();
 
-    await mydb.dropDatabase();
-
-    let DBnames2 = await indexedDB.databases();
-    DBnames2 = DBnames2.map(db => db.name);
-
-    expect(DBnames2.indexOf('testDeketeDB') === -1).to.equal(true);
+    expect(isDBExit).to.equal(false);
   })
 })

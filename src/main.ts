@@ -62,6 +62,12 @@ class IndexedDBP {
     const transaction = this.getTransaction(name, type);
     return transaction.objectStore(name);
   }
+  public closeDB() {
+    this.db.close();
+    this.openRequest.onerror = null;
+    this.openRequest.onsuccess = null;
+    this.openRequest.onupgradeneeded = null;
+  }
   public containDataBase(name: string) {
     const containPromise = new Promise((resolve, reject) => {
       let dbExists = true;
@@ -77,10 +83,11 @@ class IndexedDBP {
       req.onerror = (error) => {
         reject(this.patchError('open db error'));
       };
-      req.onupgradeneeded = (event: any) => {
+      req.onupgradeneeded = async (event: any) => {
         dbExists = false;
         event.target.result.close();
         IndexedDB.deleteDatabase(name);
+        req.onerror = null;
         resolve(dbExists);
       };
     });
@@ -164,20 +171,21 @@ class IndexedDBP {
       let transaction;
       if (this.versionTransaction) {
         transaction = this.versionTransaction;
+        delete this.versionTransaction;
       } else {
         transaction = this.getTransaction(name, 'readonly');
       }
       const objectStore = transaction.objectStore(name);
 
-      transaction.onabort = (e) => {
+      transaction.addEventListener('abort', (e) => {
         reject(this.patchError('transaction abort'));
-      };
-      transaction.oncomplete = (e) => {
+      });
+      transaction.addEventListener('complete', (e) => {
         resolve(getIndex(objectStore.indexNames, indexName) > -1);
-      };
-      transaction.onerror = (e) => {
+      });
+      transaction.addEventListener('error', (e) => {
         reject(this.patchError('transaction error'));
-      };
+      });
     });
     return containIndexPromise;
   }
@@ -191,7 +199,9 @@ class IndexedDBP {
    */
   public async createIndex(name: string, indexName: string, keyPath: string, objectParameters: IDBIndexParameters) {
     await this.toggleMode('versionChange');
-    const objectStore = this.versionTransaction.objectStore(name);
+    const transaction = this.versionTransaction;
+    const objectStore = transaction.objectStore(name);
+
     objectStore.createIndex(indexName, keyPath, objectParameters);
     return true;
   }
@@ -203,7 +213,9 @@ class IndexedDBP {
    */
   public async deleteIndex(name: string, indexName: string) {
     await this.toggleMode('versionChange');
-    const objectStore = this.versionTransaction.objectStore(name);
+    const transaction = this.versionTransaction;
+    const objectStore = transaction.objectStore(name);
+
     objectStore.deleteIndex(indexName);
     return true;
   }
@@ -410,8 +422,7 @@ class IndexedDBP {
         }
       };
       openRequest.onblocked = (event) => {
-        console.log(event);
-        reject(this.patchError('the db is blocked'));
+        reject(this.patchError('the db is blocked, maybe the database is used in ohter place, please check it!'));
       };
       openRequest.onsuccess = (event: any) => {
         this.db = event.target.result;
@@ -420,9 +431,18 @@ class IndexedDBP {
         resolve(true);
       };
       openRequest.onupgradeneeded = (event: any) => {
-        // event instanceof IDBVersionChangeEvent === true
         this.db = event.target.result;
         this.versionTransaction = event.target.transaction;
+
+        this.versionTransaction.addEventListener('abort', (e) => {
+          delete this.versionTransaction;
+        });
+        this.versionTransaction.addEventListener('complete', (e) => {
+          delete this.versionTransaction;
+        });
+        this.versionTransaction.addEventListener('error', (e) => {
+          delete this.versionTransaction;
+        });
         if (this.onSuccess) { this.onSuccess(event); }
 
         resolve(true);
@@ -453,13 +473,6 @@ class IndexedDBP {
     }
     this.onError(error);
     return error;
-  }
-
-  private closeDB() {
-    this.db.close();
-    this.openRequest.onerror = null;
-    this.openRequest.onsuccess = null;
-    this.openRequest.onupgradeneeded = null;
   }
 
   private toggleMode(mode: 'normal' | 'versionChange') {

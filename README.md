@@ -60,59 +60,59 @@ more example to see [demo](https://github.com/fayfang/indexedDBP/tree/master/tes
 
 ## operation
 ### Database Operation
-##### constructor (options?: $\color{red}{object}$)
+##### constructor (options?: object)
 + constructor of the class
 + default options = {name: 'indexedDBP', version: 1, onError: fn, onSuccess: fn}
 
-##### db.containDataBase(databaseName: $\color{red}{string}$):  $\color{blue}{Promise}$):
+##### db.containDataBase(databaseName: string): Promise:
 + a database exist or not, you can use it before init()
 
-##### db.init(): $\color{blue}{Promise}$
+##### db.init(): Promise
 + init the database, you must init a new instance before other operation
 
-##### db.closeDB(): $\color{blue}{undefined}$
+##### db.closeDB(): undefined
 + close the database
 
-##### db.dropDatabase(): $\color{blue}{Promise}$
+##### db.dropDatabase(): Promise
 + delete the databse
 
 ### ObjectStore Operation
-##### db.containObjectStore(name: $\color{red}{string}$): $\color{blue}{boolean}$
+##### db.containObjectStore(name: string): boolean
 + the database contain the obejectStore or not
 
-##### db.createObjectStore(name: $\color{red}{string}$, options?: $\color{red}{ObjectStoreOptions}$): $\color{blue}{Promise}$
+##### db.createObjectStore(name: string, options?: ObjectStoreOptions): Promise
 + create objectStore in this database
 + default ObjectStoreOptions = {autoIncrement: true, keyPath: 'id'};
 
-##### db.deleteObjectStore(name: $\color{red}{string}$)
+##### db.deleteObjectStore(name: string)
 + Delete objectStore in this database
 
 ### Document Operation
-##### db.objectStoreName.containIndex(indexName: $\color{red}{string}$):  $\color{blue}{Promise}$
+##### db.objectStoreName.containIndex(indexName: string): Promise
 + the obejectStore contain the index or not
 
-##### db.objectStoreName.createIndex(indexName:  $\color{red}{string}$, keyPath?: $\color{red}{string}$, objectParameters?:  $\color{red}{IDBIndexParameters}$):  $\color{blue}{Promise}$
+##### db.objectStoreName.createIndex(indexName: string, keyPath?: string, objectParameters?: IDBIndexParameters): Promise
 + create a index for the objectStore
 + [IDBIndexParameters](https://developer.mozilla.org/en-US/docs/Web/API/IDBIndexParameters)
 
-##### db.objectStoreName.deleteIndex(indexName: $\color{red}{string}$):  $\color{blue}{Promise}$
+##### db.objectStoreName.deleteIndex(indexName: string): Promise
 + create a index of the objectStore
 
-##### db.objectStoreName.count(query?:$\color{red}{QueryOptions}$):  $\color{blue}{Promise}$
+##### db.objectStoreName.count(query?: QueryOptions): Promise
 + count the objectStoreName by QueryOptions
 + get total when query is undefined
 
-##### db.objectStoreName.find(query:$\color{red}{key | index | QueryOptions}$, indexName?: $\color{red}{string}$):  $\color{blue}{Promise}$
+##### db.objectStoreName.find(query: key | index | QueryOptions, indexName?: tring): Promise
 + fint data by query
 
-##### db.objectStoreName.insert(document:$\color{red}{any}$, key?: $\color{red}{string}$):  $\color{blue}{Promise}$
+##### db.objectStoreName.insert(document: any, key?: string): Promise
 + insert data
 
-##### db.objectStoreName.update(query:$\color{red}{key | QueryOptions}$, data: $\color{red}{any}$, options?: $\color{red}{UpdateOptions}$):  $\color{blue}{Promise}$
+##### db.objectStoreName.update(query: key | QueryOptions, data: any, options?: UpdateOptions): Promise
 + update data
 + default UpdateOptions = {upsert: false, multi: fasle, extend: true}
 
-##### db.objectStoreName.remove(query?:$\color{red}{key | QueryOptions}$):  $\color{blue}{Promise}$
+##### db.objectStoreName.remove(query?: key | QueryOptions): Promise
 + remove data
 
 ## Interface

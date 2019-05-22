@@ -12,7 +12,7 @@ IndexedDBP is a simple way to use IndexedDB in browsers, base on Promise, simili
 ``` typeScript
 import IndexedDBP from 'indexeddbp';
 (async () => {
-await mydb.init();
+  await mydb.init();
   // deleteIndex
   // const isContainIndex = await mydb.$db.indexObjectStore.containIndex('time');
   // if (mydb.containObjectStore('indexObjectStore') && isContainIndex) {

@@ -4,7 +4,9 @@
 <!-- [END badges] -->
 IndexedDBP is a simple way to use IndexedDB in browsers, base on Promise, similiar to mongoDB api.
 
-```npm install indexeddbp```
+``` node
+  npm install indexeddbp
+```
 
 ## example
 ``` typeScript

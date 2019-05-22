@@ -55,13 +55,6 @@ class IndexedDBP {
   public init() {
     return this.use(this.name, this.version);
   }
-  public getTransaction(name: string, type: transactionType): IDBTransaction {
-    return this.db.transaction(name, type);
-  }
-  public getObjectStore(name: string, type: transactionType): IDBObjectStore {
-    const transaction = this.getTransaction(name, type);
-    return transaction.objectStore(name);
-  }
   public closeDB() {
     this.db.close();
     this.openRequest.onerror = null;
@@ -128,7 +121,7 @@ class IndexedDBP {
     const storeNames = this.db.objectStoreNames;
     return getIndex(storeNames, name) > -1;
   }
-  /**
+  /**r
    * create objectStore
    * @param {string} Name objectStore Name
    * @param {object} options objectStore options
@@ -293,7 +286,7 @@ class IndexedDBP {
    * @param {object} document
    * @param {object} options
    */
-  public async insert(name: string, document: any, key: any) {
+  public async insert(name: string, document: any, key?: any) {
     await this.toggleMode('normal');
 
     const inertPromise = new Promise((resolve, reject) => {
@@ -504,6 +497,13 @@ class IndexedDBP {
       const error = errorEvent.target.error;
       reject(this.patchError(error.message || msg));
     };
+  }
+  private getTransaction(name: string, type: transactionType): IDBTransaction {
+    return this.db.transaction(name, type);
+  }
+  private getObjectStore(name: string, type: transactionType): IDBObjectStore {
+    const transaction = this.getTransaction(name, type);
+    return transaction.objectStore(name);
   }
 }
 

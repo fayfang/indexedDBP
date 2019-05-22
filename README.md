@@ -1,5 +1,7 @@
 # IndexedDBP
-![pass](https://travis-ci.org/fayfang/indexedDBP.svg?branch=master)
+<!-- [START badges] -->
+[![Build Status](https://travis-ci.org/fayfang/indexedDBP.svg?branch=master)](https://travis-ci.org/fayfang/indexedDBP)
+<!-- [END badges] -->
 IndexedDBP is a simple way to use IndexedDB in browsers, base on Promise, similiar to mongoDB api.
 
 ```npm install indexeddbp```

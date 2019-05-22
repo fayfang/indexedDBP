@@ -1,6 +1,6 @@
 {
   "name": "indexeddbp",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "IndexedDB Promise Api, similiar to mongoDB api",
   "main": "dist/IndexedDBP.js",
   "license": "MIT",

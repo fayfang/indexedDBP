@@ -25,9 +25,7 @@ import IndexedDBP from 'indexeddbp';
   // }
 
   // create objectStore
-  if (!mydb.containObjectStore('testObjectStore')) {
-    await mydb.createObjectStore('testObjectStore');
-  }
+  await mydb.useObjectStore('testObjectStore');
   if (!mydb.containObjectStore('indexObjectStore')) {
     await mydb.createObjectStore('indexObjectStore', {keyPath: 'randomId'});
     await mydb.$db.indexObjectStore.createIndex('time', 'time', {unique: false, multiEntry: false});

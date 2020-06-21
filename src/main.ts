@@ -2,7 +2,14 @@
  * 说明：
  * 封装indexedDB成类mongo风格的API，提供方便的结构化调用
  */
-import {IndexedDBPOptions, ObjectStoreOptions, UpdateOptions, transactionType, QueryOptions} from './interface';
+import {
+  IndexedDBPOptions,
+  ObjectStoreOptions,
+  UpdateOptions,
+  transactionType,
+  QueryOptions,
+  DBCONTAINER,
+} from './interface';
 import {hasVersionError, parseQueryToIDBKeyRange, getIndex} from './tools';
 
 const DefaultIndexedDBPOptions: IndexedDBPOptions = {
@@ -38,7 +45,7 @@ class IndexedDBP {
       this.insertObjectStore(names[i]);
     }
   }
-  public $db: any = {};
+  public $db: DBCONTAINER = {};
   public name!: string;
   public version?: number;
   private pdb!: any;
@@ -46,6 +53,7 @@ class IndexedDBP {
   private versionTransaction!: IDBTransaction;
   private onError!: any;
   private onSuccess!: any;
+  private usePromise!: Promise<any> | void;
   constructor(options: IndexedDBPOptions = DefaultIndexedDBPOptions) {
     this.name = options.name;
     this.version = options.version;
@@ -121,7 +129,7 @@ class IndexedDBP {
     const storeNames = this.db.objectStoreNames;
     return getIndex(storeNames, name) > -1;
   }
-  /**r
+  /**
    * create objectStore
    * @param {string} Name objectStore Name
    * @param {object} options objectStore options
@@ -138,6 +146,20 @@ class IndexedDBP {
 
     this.insertObjectStore(name);
     return objectStore;
+  }
+  /**
+   * create objectStore
+   * @param {string} Name objectStore Name
+   * @param {object} options objectStore options
+   * @returns {IDBObjectStore}
+   */
+  public async useObjectStore(name: string, options: ObjectStoreOptions = DefaultObjectStoreOptions) {
+    if (!this.containObjectStore(name)) {
+      const result = await this.createObjectStore(name, options);
+      return result;
+    } else {
+      return this.$db[name];
+    }
   }
   /**
    * delete objectStore
@@ -385,6 +407,28 @@ class IndexedDBP {
     return removePromise;
   }
   /**
+   * remove document
+   * @param {string} name
+   * @param {object | string} query the query params to find document
+   */
+  public async clear(name: string) {
+    await this.toggleMode('normal');
+
+    const removePromise = new Promise((resolve, reject) => {
+      const objectStore = this.getObjectStore(name, 'readwrite');
+
+      const req = objectStore.clear();
+
+      this.documentHandleError(req, reject, 'remove IDBRequest unknown error');
+
+      req.onsuccess = (event) => {
+        resolve(event);
+      };
+    });
+
+    return removePromise;
+  }
+  /**
    * select Database
    * @param {string} dbName db's name
    * @param {string} dbVersion db's version
@@ -442,6 +486,9 @@ class IndexedDBP {
       };
     });
 
+    this.usePromise = dbPromise.finally(() => {
+      this.usePromise = undefined;
+    });
     return dbPromise;
   }
   private insertObjectStore(name: string) {
@@ -450,6 +497,7 @@ class IndexedDBP {
       update: this.update.bind(this, name),
       remove: this.remove.bind(this, name),
       find: this.find.bind(this, name),
+      clear: this.clear.bind(this, name),
       count: this.count.bind(this, name),
       createIndex: this.createIndex.bind(this, name),
       deleteIndex: this.deleteIndex.bind(this, name),
@@ -467,14 +515,20 @@ class IndexedDBP {
     this.onError(error);
     return error;
   }
-
-  private toggleMode(mode: 'normal' | 'versionChange') {
+  /**
+   * @description 这里设计成阻塞的，当多个toggleMode同时进行时，只能进行一个
+   */
+  private async toggleMode(mode: 'normal' | 'versionChange') {
     const Toggle = async (change: boolean) => {
       const name = this.db.name;
       const version = change ? this.db.version + 1 : this.db.version;
       this.closeDB();
       await this.use(name, version);
     };
+
+    if (this.usePromise) {
+      await this.usePromise;
+    }
 
     if (mode === 'versionChange') {
       if (!this.versionTransaction) {
@@ -486,6 +540,7 @@ class IndexedDBP {
 
     if (mode === 'normal') {
       if (this.versionTransaction) {
+
         return Toggle(false);
       } else {
         return Promise.resolve(true);

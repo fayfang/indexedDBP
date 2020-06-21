@@ -25,4 +25,18 @@ export interface IndexedDBPOptions {
   onSuccess?: any;
 }
 
+export interface DBCONTAINER {
+  [prop: string]: {
+    insert: (document: any, key?: any) => Promise<unknown>,
+    update: (query: any, data: any, options: UpdateOptions) => Promise<unknown>,
+    remove: (query: any) => Promise<unknown>,
+    clear: () => Promise<unknown>,
+    find: (query: any, indexName?: string) => Promise<unknown>,
+    count: (query?: QueryOptions) => Promise<unknown>,
+    createIndex: (indexName: string, keyPath: string, objectParameters: IDBIndexParameters) => Promise<boolean>,
+    deleteIndex: (indexName: string) => Promise<boolean>,
+    containIndex: (name: string, indexName: string) => Promise<unknown>,
+  };
+}
+
 export type transactionType = 'readonly' | 'readwrite' | 'versionchange' | undefined;
